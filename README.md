@@ -12,3 +12,14 @@ That is, based on different market conditions, the exchange will alter the funct
 
 We plan on leveraging Chainlink price oracles in tandem with Chainlink Keepers in order to regularly check the changes of market prices over a given period, and then automatically adjust the bonding curve to optimize for different trading and LP positions.
 
+## Contracts
+
+We plan on coding the primary exchange, swap, and tunable bonding curve contracts in solidity. 
+
+## Front-End
+
+We plan on building a simple Web3 front-end using Next.js and Moralis.
+
+## Feasibility Studies
+
+We will code some initial tests and analyses using monte carlo in python, and display the use cases of such an exchange.
