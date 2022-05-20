@@ -10,11 +10,6 @@ AdaptiveTradingFunction.py
 functions for modeling the adaptive trading function for the Adaptive Market 
 Maker Chainlin Hackathon 2022 project.
 
-The q-parameter idea and functional form of the trading functions came from the
-excellent paper:
-
-"Constant Power Root Market Makers" : https://arxiv.org/pdf/2205.07452.pdf
-
 """
 
 import numpy as np
@@ -94,7 +89,7 @@ def calculate_y_vec(xvec,q, k):
     return yvec
 
 
-def plotFeasibleTradingCurves():
+def plotFeasibleTradingCurves(xfraction = 0.5, yfraction = 0.5):
     """
     Plot the various bonding curves / trading curves for the various market 
     makers with different q values.
@@ -109,7 +104,7 @@ def plotFeasibleTradingCurves():
     qvals = np.arange(-0.8,0.8+0.2,0.2)
     plt.figure()
     for q in qvals:
-        k = calculate_k(q, xmax/2,xmax/2)
+        k = calculate_k(q, xfraction * xmax,yfraction * xmax)
         y = calculate_y_vec(x, q, k)
         if np.isclose(q,0):
             plt.plot(x,y,'k--',label=f"q={q:3.1f} : xy=const.")
@@ -121,3 +116,7 @@ def plotFeasibleTradingCurves():
     plt.legend(loc='best')
     plt.show()
     
+    
+if __name__ == '__main__':
+    plotFeasibleTradingCurves(0.5,0.5)
+    plotFeasibleTradingCurves(0.7, 0.3)
