@@ -83,7 +83,11 @@ def calculate_y_vec(xvec,q, k):
             if np.isclose(float(q),0):
                 yvec.append(k / x)
             else:
-                yvec.append((k**q - x**q)**(Decimal(1)/q))
+                # if k**q < x**q, return nan.
+                if (x**q > k**q):
+                    yvec.append(np.nan)
+                else:
+                    yvec.append((k**q - x**q)**(Decimal(1)/q))
         except:
             yvec.append(np.nan)
     return yvec
@@ -101,22 +105,108 @@ def plotFeasibleTradingCurves(xfraction = 0.5, yfraction = 0.5):
     """
     xmax = 10000
     x = np.linspace(0.01, xmax, 100)
-    qvals = np.arange(-0.8,0.8+0.2,0.2)
-    plt.figure()
+    # qvals = [-0.8, 0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8]
+    qvals = [-1.0, -0.5, 0.0, 0.5]
+    plt.figure(figsize=(6,6))
     for q in qvals:
         k = calculate_k(q, xfraction * xmax,yfraction * xmax)
         y = calculate_y_vec(x, q, k)
         if np.isclose(q,0):
-            plt.plot(x,y,'k--',label=f"q={q:3.1f} : xy=const.")
+            plt.plot(x,y,'k--',label=f"q={q:3.1f} : xy=k (uni.)")
         else:
             plt.plot(x,y,label=f"q={q:3.1f}")
-
+    plt.xlabel('Token X reserves')
+    plt.ylabel('Token Y reserves')
     plt.xlim(0,xmax)
     plt.ylim(0,xmax)
-    plt.legend(loc='best')
+    # plt.legend(loc='best')
     plt.show()
+    
+class Exchange():
+    def __init__(self, x,y,q):
+        self.q = Decimal(q)
+        self.x = Decimal(x)
+        self.y = Decimal(y)
+        if np.isclose(float(q),0.0):
+            self.k = self.x*self.y
+        else:
+            self.k  = (self.x**self.q + self.y**self.q)**(Decimal(1)/self.q)
+        self.reserveHistory = [(self.x, self.y)]
+    
+    
+    def __repr__(self):
+        s = '\n'.join(["===== ADAPTIVE MARKET MAKER =====",
+                       f"q = {self.q}",
+                       f"x = {self.x}",
+                       f"y = {self.y}",
+                       f"k = {self.k}"])
+        return s
+    
+    def updateQ(self, newq):
+        self.q = Decimal(newq)
+        if np.isclose(float(self.q),0.0):
+            self.k = self.x*self.y
+        else:
+            self.k  = (self.x**self.q + self.y**self.q)**(Decimal(1)/self.q)
+    
+    def tradeXforY(self, dx):
+        dx = Decimal(dx)
+        newx = self.x + dx
+        if np.isclose(float(self.q),0.0):
+            newy = self.k / newx
+        else:
+            newy = (self.k**self.q - newx**self.q)**(Decimal(1)/self.q)
+        dy = self.y - newy
+        
+        self.x = newx
+        self.y = newy
+        self.reserveHistory.append((self.x,self.y))
+        return dy
+       
+    def tradeYforX(self, dy):
+        dy = Decimal(dy)
+        newy = self.y + dy
+        if np.isclose(float(self.q),0.0):
+            newx = self.k / newy
+        else:
+            newx = (self.k**self.q - newy**self.q)**(Decimal(1)/self.q)
+        dx = self.x - newx
+        
+        self.x = newx
+        self.y = newy
+        self.reserveHistory.append((self.x,self.y))
+
+        
+        return dx
+    
+    def plotReserveHistory(self,ax):
+        rh = np.array(self.reserveHistory)
+        xvals = rh[:,0]
+        yvals = rh[:,1]
+        
+        ax.plot(xvals,yvals,'o',alpha=0.3)
     
     
 if __name__ == '__main__':
-    plotFeasibleTradingCurves(0.5,0.5)
-    plotFeasibleTradingCurves(0.7, 0.3)
+    pass
+    ex = Exchange(1000000000, 1000000000, -0.5)
+    dx = 10000000
+    plt.plot(ex.x, ex.y,'go')
+    for i in range(100):
+        print(ex.tradeXforY(dx))
+    ex.updateQ(0)
+    plt.plot(ex.x, ex.y,'r^')
+    ax = plt.gca()
+    for i in range(100):
+        print(ex.tradeYforX(dx))
+    ax.plot(ex.x, ex.y, 'ks')
+    ex.updateQ(0.5)
+    for i in range(50):
+        print(ex.tradeXforY(dx))
+    ax.plot(ex.x, ex.y, 'kx')
+    ex.plotReserveHistory(ax)
+
+    
+
+    # plotFeasibleTradingCurves(0.5,0.5)
+    # plotFeasibleTradingCurves(0.7, 0.3)
