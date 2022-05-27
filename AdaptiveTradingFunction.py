@@ -106,8 +106,9 @@ def plotFeasibleTradingCurves(xfraction = 0.5, yfraction = 0.5):
     xmax = 10000
     x = np.linspace(0.01, xmax, 100)
     # qvals = [-0.8, 0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8]
+
     # qvals = [-1.0, -0.5, 0.0, 0.5]
-    qvals = [-1.0,  0.0,1.0]
+    qvals = [-1.0, -0.5, 0.0, 0.5]
     plt.figure(figsize=(6,6))
     for q in qvals:
         k = calculate_k(q, xfraction * xmax,yfraction * xmax)

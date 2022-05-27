@@ -1,8 +1,10 @@
 # ChainlinkHackathon2022
 
+
 Chainlink Hackathon project 2022 -- Adaptive Market Maker
 
 Check out our interactive app [here](https://chainlink-hackathon2022-frontend.vercel.app)
+
 
 
 ## Adaptive Trading Curves
@@ -41,7 +43,7 @@ And here is the repo containing the front-end code base:
 
 I plan on leveraging Chainlink price oracles in tandem with Chainlink Keepers in order to regularly check the changes of market prices over a given period, and then automatically adjust the bonding curve to optimize for different trading and LP positions.
 
-![blockDiagram](.//AdMM_Block_Diagram.PNG)
+![blockDiagram](./AdMM_Block_Diagram.PNG)
 
 ### Feasibility Studies
 
